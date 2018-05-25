@@ -13,6 +13,7 @@
  '(magit-log-section-arguments '("--graph" "--color" "-n256"))
  '(org-agenda-files
    '("~/Code-files/CareVision/docs/android-tasks.org" "~/org/inbox.org" "~/org/gtd.org" "~/org/tickler.org"))
+ ;; TODO - Figure out changes for this.
  '(package-archives
    '(("melpa" . "https://melpa.org/packages/")
      ("gnu" . "http://elpa.gnu.org/packages/")

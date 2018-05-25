@@ -1,17 +1,16 @@
-;; Time-stamp: <2018-05-13 13:03:08 csraghunandan>
-;; Author: C S Raghunandan
 
 ;; https://www.reddit.com/r/emacs/comments/3kqt6e/2_easy_little_known_steps_to_speed_up_emacs_start/
 (defvar gc-cons-threshold--orig gc-cons-threshold)
 (setq gc-cons-threshold (* 100 1024 1024)
       gc-cons-percentage 0.6)
 
-(defun rag-set-gc-threshold ()
+(defun josh-set-gc-threshold ()
   "Reset `gc-cons-threshold' and `gc-cons-percentage' to their default values."
   (setq gc-cons-threshold gc-cons-threshold--orig
         gc-cons-percentage 0.1))
 
 (require 'package)
+(package-initialize)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
 
@@ -67,10 +66,8 @@
 (require 'setup-editing)
 (require 'setup-racket)
 (require 'setup-hungry-delete)
-(require 'setup-rust)
 (require 'setup-lsp)
 (require 'setup-cc)
-(require 'setup-haskell)
 (require 'setup-python)
 (require 'setup-tex)
 (require 'setup-origami)
@@ -78,7 +75,6 @@
 (require 'setup-white-space)
 (require 'setup-mc)
 (require 'setup-js)
-(require 'setup-typescript)
 (require 'setup-ocaml)
 (require 'setup-web-mode)
 (require 'setup-css)
@@ -106,7 +102,6 @@
 (require 'setup-shell)
 (require 'setup-smerge)
 (require 'setup-nov)
-(require 'xkcd)
 (require 'setup-docker)
 (require 'setup-pdf)
 
@@ -120,6 +115,6 @@
 (unless (server-running-p) (server-start))
 
 ;; set gc-cons-threshold back to original value
-(add-hook 'emacs-startup-hook #'rag-set-gc-threshold)
+(add-hook 'emacs-startup-hook #'josh-set-gc-threshold)
 
 ;;; init.el ends here

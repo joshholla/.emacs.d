@@ -37,3 +37,4 @@ package-quickstart.el
 
 # ignore ord id locations
 .org-id-locations
+.projectile
