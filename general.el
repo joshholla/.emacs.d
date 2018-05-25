@@ -1,4 +1,4 @@
-;; Time-stamp: <2018-03-03 13:03:21 csraghunandan>
+;; Time-stamp: <2018-05-25 15:15:45 joshuaholla>
 
 ;;; Emacs version check
 (defmacro >=e (version &rest body)
@@ -69,7 +69,7 @@ If HERE is non-nil, also insert the string at point."
 ;; Quitting emacs via `C-x C-c` or the GUI 'X' button
 (setq confirm-kill-emacs #'y-or-n-p)
 
-(setq user-mail-address "rnraghunandan@gmail.com")
+(setq user-mail-address "joshreadsmail@gmail.com")
 
 (defun is-mac-p ()
   (eq system-type 'darwin))

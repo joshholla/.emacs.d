@@ -1,4 +1,4 @@
-;; Time-stamp: <2018-03-06 21:52:55 csraghunandan>
+;; Time-stamp: <2018-05-25 15:01:29 joshuaholla>
 
 ;; All the macOS related configuration
 
