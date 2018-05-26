@@ -1,4 +1,6 @@
-;; Time-stamp: <2018-05-06 09:28:33 csraghunandan>
+;; Time-stamp: <2018-05-26 12:14:24 joshuaholla>
+
+;; Switching to neotree. Can remove this if I don't need it in a few pushes.
 
 ;; treemacs: a tree layout file explorer for Emacs
 ;; https://github.com/Alexander-Miller/treemacs

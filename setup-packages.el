@@ -1,7 +1,7 @@
-;; Time-stamp: <2018-05-13 13:02:09 csraghunandan>
+;; Time-stamp: <2018-05-26 11:15:14 joshuaholla>
 
 (unless (package-installed-p 'use-package) ; unless it is already installed
-  (package-refresh-contents) ; updage packages archive
+  (package-refresh-contents) ; update packages archive
   (package-install 'use-package)) ; install the latest version of use-package
 (eval-when-compile (require 'use-package))
 (setq use-package-always-ensure t)

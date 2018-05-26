@@ -35,7 +35,8 @@
 (require 'setup-org)
 (require 'setup-backup)
 (require 'setup-selected)
-(require 'setup-treemacs)
+;;(require 'setup-treemacs)
+(require 'setup-neotree)
 (require 'setup-search)
 (require 'setup-ibuffer)
 (require 'setup-recentf)
@@ -57,7 +58,7 @@
 (require 'setup-buffers)
 (require 'setup-ivy)
 (require 'setup-counsel)
-(require 'setup-swiper)
+(require 'setup-swiper)e
 (require 'setup-movement)
 (require 'setup-markdown)
 (require 'setup-highlight)
@@ -118,7 +119,7 @@
 (add-hook 'emacs-startup-hook #'josh-set-gc-threshold)
 
 ;; tring to get dired fixed up. (listing error fix)
-(setq insert-directory-program "/usr/local/bin/gls")   ;; this is the path to
+(require 'all-the-icons)(setq insert-directory-program "/usr/local/bin/gls")   ;; this is the path to
 ;; > which gls RET (assuming coreutils is installed)
 (setq dired-listing-switches "-aBhl --group-directories-first")
 
