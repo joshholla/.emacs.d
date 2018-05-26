@@ -10,7 +10,6 @@
         gc-cons-percentage 0.1))
 
 (require 'package)
-(package-initialize)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
 
@@ -36,7 +35,6 @@
 (require 'setup-backup)
 (require 'setup-selected)
 ;;(require 'setup-treemacs)
-(require 'setup-neotree)
 (require 'setup-search)
 (require 'setup-ibuffer)
 (require 'setup-recentf)
@@ -58,7 +56,7 @@
 (require 'setup-buffers)
 (require 'setup-ivy)
 (require 'setup-counsel)
-(require 'setup-swiper)e
+(require 'setup-swiper)
 (require 'setup-movement)
 (require 'setup-markdown)
 (require 'setup-highlight)
@@ -105,6 +103,7 @@
 (require 'setup-nov)
 (require 'setup-docker)
 (require 'setup-pdf)
+(require 'setup-neotree)
 
 ;; install all packages (if they already not installed by use-package)
 (package-install-selected-packages)
@@ -119,7 +118,7 @@
 (add-hook 'emacs-startup-hook #'josh-set-gc-threshold)
 
 ;; tring to get dired fixed up. (listing error fix)
-(require 'all-the-icons)(setq insert-directory-program "/usr/local/bin/gls")   ;; this is the path to
+(setq insert-directory-program "/usr/local/bin/gls")   ;; this is the path to
 ;; > which gls RET (assuming coreutils is installed)
 (setq dired-listing-switches "-aBhl --group-directories-first")
 
