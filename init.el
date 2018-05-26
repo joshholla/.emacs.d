@@ -117,4 +117,9 @@
 ;; set gc-cons-threshold back to original value
 (add-hook 'emacs-startup-hook #'josh-set-gc-threshold)
 
+;; tring to get dired fixed up. (listing error fix)
+(setq insert-directory-program "/usr/local/bin/gls")   ;; this is the path to
+;; > which gls RET (assuming coreutils is installed)
+(setq dired-listing-switches "-aBhl --group-directories-first")
+
 ;;; init.el ends here
