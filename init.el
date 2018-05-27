@@ -10,6 +10,8 @@
         gc-cons-percentage 0.1))
 
 (require 'package)
+;; (package-initialize) ;; This throws a warning, but it's needed for new
+;; installs. Commenting it out for now.
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
 
@@ -104,6 +106,7 @@
 (require 'setup-docker)
 (require 'setup-pdf)
 (require 'setup-neotree)
+(require 'setup-ein)
 
 ;; install all packages (if they already not installed by use-package)
 (package-install-selected-packages)
@@ -121,5 +124,8 @@
 (setq insert-directory-program "/usr/local/bin/gls")   ;; this is the path to
 ;; > which gls RET (assuming coreutils is installed)
 (setq dired-listing-switches "-aBhl --group-directories-first")
+
+;; For Zoning out:
+(setq zone-timer (run-with-idle-timer 120 t 'zone))
 
 ;;; init.el ends here

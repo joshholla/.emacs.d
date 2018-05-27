@@ -1,4 +1,4 @@
-;; Time-stamp: <2018-05-08 22:13:39 csraghunandan>
+;; Time-stamp: <2018-05-26 21:45:06 joshuaholla>
 
 ;; flash the modeline instead of ringing the bell
 ;; https://github.com/purcell/mode-line-bell
@@ -73,5 +73,8 @@
 (rename-modeline "js2-mode" js2-mode "JS2")
 (rename-modeline "typescript-mode" typescript-mode "TS")
 (rename-modeline "haskell-mode" haskell-mode "𝞴=")
+
+;; Minor mode to get the nyan slider:
+;; (use-package nyan-mode :ensure t)
 
 (provide 'setup-mode-line)
