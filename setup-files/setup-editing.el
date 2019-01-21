@@ -1,4 +1,8 @@
-;; Time-stamp: <2018-05-13 18:40:21 csraghunandan>
+;;; setup-editing.el -*- lexical-binding: t; -*-
+;; Time-stamp: <2018-12-30 01:14:55 csraghunandan>
+
+;; Copyright (C) 2016-2018 Chakravarthy Raghunandan
+;; Author: Chakravarthy Raghunandan <rnraghunandan@gmail.com>
 
 ;;; configuration for all the editing stuff in emacs
 ;; Kill ring
@@ -65,7 +69,7 @@ the comment characters from the joined line."
 
 (bind-keys
  ("M-j" . rag/pull-up-line)
- ("s-j" . rag/push-up-line))
+ ("H-j" . rag/push-up-line))
 
 (defun rag/smart-open-line ()
   "Insert an empty line after the current line.
@@ -239,9 +243,6 @@ abc |ghi        <-- point still after white space after calling this function."
         (t ; do nothing otherwise, includes the case where the point is at EOL
          )))
 ;; Delete extra horizontal white space after `kill-word' and `backward-kill-word'
-(advice-add 'sp-kill-word :after #'modi/just-one-space-post-kill-word)
-(advice-add 'sp-backward-kill-word :after #'modi/just-one-space-post-kill-word)
-(advice-add 'sp-kill-sexp :after #'modi/just-one-space-post-kill-word)
 (advice-add 'kill-word :after #'modi/just-one-space-post-kill-word)
 (advice-add 'backward-kill-word :after #'modi/just-one-space-post-kill-word)
 
@@ -318,7 +319,6 @@ _c_apitalize        _U_PCASE        _d_owncase        _<SPC>_ →Cap→UP→down
                             rust-mode
                             web-mode
                             css-mode
-                            python-mode
                             c++-mode
                             c-mode
                             racket-mode
@@ -359,14 +359,12 @@ _c_apitalize        _U_PCASE        _d_owncase        _<SPC>_ →Cap→UP→down
 
 (bind-keys
  ("C-c o s" . cycle-spacing)
- ("C-h" . delete-backward-char)
- ("C-M-h" . backward-kill-word)
  ("M-;" . comment-line)
  ("C-c o o" . xah-clean-whitespace))
 
 ;; configuration for auto-fill-mode
 (use-package simple :ensure nil
-  :chords (("m," . beginning-of-buffer)
+  :chords ((",m" . beginning-of-buffer)
            (",." . end-of-buffer))
   :hook ((prog-mode text-mode org-mode) . auto-fill-mode)
   :config
@@ -496,7 +494,7 @@ Version 2017-01-11"
 ;; undo-tree: Treat undo history as a tree
 ;; https://www.emacswiki.org/emacs/UndoTree
 (use-package undo-tree
-  :bind (("s-/" . undo-tree-redo))
+  :bind (("H-/" . undo-tree-redo))
   :init (global-undo-tree-mode))
 
 ;; utf-8 everywhere
@@ -507,6 +505,9 @@ Version 2017-01-11"
 (unless (eq system-type 'windows-nt)
   (set-selection-coding-system 'utf-8))
 (prefer-coding-system 'utf-8)
+(setq-default buffer-file-coding-system 'utf-8)
+(when (fboundp 'set-charset-priority)
+  (set-charset-priority 'unicode)) ; pretty
 
 ;; smart-dash: underscores without having to press shift modifier for dash key
 (use-package smart-dash
@@ -575,5 +576,28 @@ associated with the original non-sudo filename."
     (back-to-indentation)
     (kill-region (point) prev-pos)))
 (bind-key "C-S-K" #'kill-back-to-indentation)
+
+;; hungry-delete: deleting a whitespace character will delete all whitespace
+;; until the next non-whitespace character
+;; https://github.com/nflath/hungry-delete
+(use-package hungry-delete
+  :config
+  (global-hungry-delete-mode)
+  (add-to-list 'hungry-delete-except-modes 'wdired-mode)
+  (add-to-list 'hungry-delete-except-modes 'ivy-occur-mode))
+
+;; poporg is a small Emacs Lisp project to help editing program strings and
+;; comments using Org mode (or any other major mode).  This can be useful as it
+;; is often more convenient to edit large pieces of text, like Emacs Lisp or
+;; Python docstrings, in an org-mode buffer instead of in a comment or a string.
+;; https://github.com/QBobWatson/poporg
+(use-package poporg
+  :bind (("C-c o p" . poporg-dwim)))
+
+;; adaptive-wrap: Smart line-wrapping with wrap-prefix
+;; https://github.com/emacsmirror/adaptive-wrap/blob/master/adaptive-wrap.el
+(use-package adaptive-wrap
+  :hook (visual-line-mode . adaptive-wrap-prefix-mode)
+  :config (setq-default adaptive-wrap-extra-indent 2))
 
 (provide 'setup-editing)

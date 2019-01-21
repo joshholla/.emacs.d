@@ -1,25 +1,51 @@
-;; Time-stamp: <2018-05-13 17:32:53 csraghunandan>
+;;; setup-css.el -*- lexical-binding: t; -*-
+;; Time-stamp: <2018-12-14 01:14:09 csraghunandan>
+
+;; Copyright (C) 2016-2018 Chakravarthy Raghunandan
+;; Author: Chakravarthy Raghunandan <rnraghunandan@gmail.com>
+
+(defun my-css-mode-hook ()
+  (set (make-local-variable 'company-backends)
+       '((company-lsp company-files :with company-yasnippet)
+         (company-dabbrev-code company-dabbrev))))
+
+(defun lsp-css-common-setup()
+  (eldoc-mode)
+  (flycheck-mode)
+  (company-mode)
+  (emmet-mode)
+  (prettier-js-mode)
+  (rainbow-mode))
 
 ;; css-mode config
-(use-package css-mode :defer t
+(use-package css-mode
   :ensure nil
-  :mode (("\\.scss\\'" . css-mode)
-         ("\\.sass\\'" . css-mode))
   :hook ((css-mode . (lambda ()
-                       (rainbow-mode)
-                       (my-css-mode-hook)
-                       (company-mode)
-                       (flycheck-mode)
-                       (emmet-mode))))
+                       (lsp-css-common-setup)
+                       (lsp))))
   :config
-  (setq css-indent-offset 2)
+  (setq css-indent-offset 2))
 
-  (defun my-css-mode-hook ()
-    (set (make-local-variable 'company-backends)
-         (>=e "26.0"
-             '((company-capf company-files company-yasnippet))
-           '((company-css company-files company-yasnippet)))))
+(use-package less-css-mode              ; Mode for Less CSS files
+  :ensure nil
+  :mode "\\.less\\'"
+  :hook ((less-css . (lambda ()
+                       (lsp-css-common-setup)
+                       (lsp)))))
 
-  (add-hook 'css-mode-hook 'prettier-js-mode))
+;; major mode for editing sass files
+;; https://github.com/nex3/sass-mode
+(use-package sass-mode
+  :mode (("\\.sass\\'" . sass-mode))
+  :hook ((sass-mode . (lambda ()
+                        (lsp-css-common-setup)
+                        (lsp)))))
+
+(use-package scss-mode                  ; Mode for SCSS files
+  :ensure nil
+  :mode "\\.scss\\'"
+  :hook ((sass-mode . (lambda ()
+                        (lsp-css-common-setup)
+                        (lsp)))))
 
 (provide 'setup-css)

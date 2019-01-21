@@ -1,10 +1,14 @@
-;; Time-stamp: <2018-03-12 22:48:34 csraghunandan>
+;;; setup-selected.el -*- lexical-binding: t; -*-
+;; Time-stamp: <2018-08-15 03:07:48 csraghunandan>
+
+;; Copyright (C) 2016-2018 Chakravarthy Raghunandan
+;; Author: Chakravarthy Raghunandan <rnraghunandan@gmail.com>
 
 ;; selected: Keymap for when region is active
 ;; https://github.com/Kungsgeten/selected.el
 (use-package selected
   :bind (:map selected-keymap
-              ("w" . whole-line-or-region-kill-region)
+              ("w" . kill-region)
               ("~" . hydra-change-case/body)
               ("c" . copy-region-as-kill)
               ("d" . duplicate-current-line-or-region)

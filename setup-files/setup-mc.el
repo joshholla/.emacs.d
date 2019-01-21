@@ -1,4 +1,8 @@
-;; Time-stamp: <2018-03-13 10:15:41 csraghunandan>
+;;; setup-mc.el -*- lexical-binding: t; -*-
+;; Time-stamp: <2018-08-15 03:03:56 csraghunandan>
+
+;; Copyright (C) 2016-2018 Chakravarthy Raghunandan
+;; Author: Chakravarthy Raghunandan <rnraghunandan@gmail.com>
 
 ;; multiple-cursors: Add multiple cursors support for emacs
 ;; https://github.com/magnars/multiple-cursors.el

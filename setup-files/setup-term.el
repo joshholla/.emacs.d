@@ -1,4 +1,8 @@
-;; Time-stamp: <2018-05-11 11:28:35 csraghunandan>
+;;; setup-term.el -*- lexical-binding: t; -*-
+;; Time-stamp: <2018-12-14 01:51:13 csraghunandan>
+
+;; Copyright (C) 2016-2018 Chakravarthy Raghunandan
+;; Author: Chakravarthy Raghunandan <rnraghunandan@gmail.com>
 
 ;; multi-term: manage multiple terminal windows easily within emacs
 ;; https://github.com/emacsorphanage/multi-term/tree/f954e4e18b0a035151d34852387e724d87a3316f
@@ -34,8 +38,7 @@
 
 ;; eterm-256color: Customizable 256 colors for emacs term and ansi-term
 ;; https://github.com/dieggsy/eterm-256color
-(use-package eterm-256color
-  :defer t
+(use-package eterm-256color :defer t
   :hook ((term-mode . eterm-256color-mode)))
 
 (use-package term :ensure nil
@@ -57,7 +60,6 @@
           ("C-y"     . term-paste)
           ("M-f"     . term-send-forward-word)
           ("M-b"     . term-send-backward-word)
-          ("C-h"     . term-send-backspace)
           ("M-p"     . term-send-up)
           ("M-n"     . term-send-down)
           ("M-d"     . term-send-forward-kill-word)
@@ -74,7 +76,8 @@
                               (hungry-delete-mode -1)))
 
   (setq multi-term-buffer-name "term")
-  (setq multi-term-program (getenv "SHELL")))
+  (setq multi-term-program (getenv "SHELL")
+        multi-term-switch-after-close 'PREVIOUS))
 
 (provide 'setup-term)
 

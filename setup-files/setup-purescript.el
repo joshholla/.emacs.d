@@ -1,4 +1,8 @@
-;; Time-stamp: <2018-03-12 22:47:38 csraghunandan>
+;;; setup-purescript.el -*- lexical-binding: t; -*-
+;; Time-stamp: <2018-08-15 03:05:58 csraghunandan>
+
+;; Copyright (C) 2016-2018 Chakravarthy Raghunandan
+;; Author: Chakravarthy Raghunandan <rnraghunandan@gmail.com>
 
 ;; configuration for purescript
 

@@ -1,4 +1,8 @@
-;; Time-stamp: <2018-05-11 10:44:56 csraghunandan>
+;;; setup-white-space.el -*- lexical-binding: t; -*-
+;; Time-stamp: <2018-08-15 03:10:36 csraghunandan>
+
+;; Copyright (C) 2016-2018 Chakravarthy Raghunandan
+;; Author: Chakravarthy Raghunandan <rnraghunandan@gmail.com>
 
 ;; ws-butler: clean trailing whitespaces unobtrusively
 ;; https://github.com/lewang/ws-butler

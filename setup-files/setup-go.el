@@ -1,12 +1,15 @@
-;; Time-stamp: <2018-05-13 18:19:48 csraghunandan>
+;;; setup-go.el -*- lexical-binding: t; -*-
+;; Time-stamp: <2018-12-13 19:55:02 csraghunandan>
+
+;; Copyright (C) 2016-2018 Chakravarthy Raghunandan
+;; Author: Chakravarthy Raghunandan <rnraghunandan@gmail.com>
 
 ;; golang configuration
 
 ;; go-mode: major-mode for editing go files
 ;; https://github.com/dominikh/go-mode.el
-(use-package go-mode :defer t
+(use-package go-mode
   :interpreter "go"
-  :ensure-system-package (goimports . "go get -u golang.org/x/tools/cmd/goimports")
   :config
   (setq gofmt-command (executable-find "goimports"))
   ;; Using -s with goimports is not supported with upstream goimports.
@@ -36,23 +39,21 @@
   (add-hook 'go-mode-hook #'flycheck-mode)
 
   ;; integrate go-guru analysis tool to emacs
-  (use-package go-guru
-    :ensure-system-package (guru . "go get -u golang.org/x/tools/cmd/guru"))
+  (use-package go-guru)
 
   ;; gorepl-mode: A minor emacs mode for Go REPL.
   ;; https://github.com/manute/gorepl-mode
   (use-package gorepl-mode
-    :ensure-system-package (gore . "go get -u github.com/motemen/gore")
     :commands (gorepl-run gorepl-run-load-current-file))
 
   ;; company-go: company backend for golang
   ;; https://github.com/nsf/gocode/tree/master/emacs-company
   (use-package company-go
-    :ensure-system-package (gocode . "go get -u github.com/nsf/gocode")
     :config
     (defun my-go-mode-hook()
       (set (make-local-variable 'company-backends)
-           '((company-go company-files company-yasnippet))))
+           '((company-go company-files :with company-yasnippet)
+             (company-dabbrev-code company-dabbrev))))
 
     (add-hook 'go-mode-hook (lambda ()
                               (company-mode)
@@ -63,9 +64,7 @@
   (use-package gotest)
 
   ;; go-rename: extra refactoring commands for go
-  (use-package go-rename
-    :ensure-system-package
-    (gorename . "go get -u golang.org/x/tools/cmd/gorename")))
+  (use-package go-rename))
 
 (provide 'setup-go)
 

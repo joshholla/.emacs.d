@@ -1,4 +1,8 @@
-;; Time-stamp: <2018-01-05 16:27:25 csraghunandan>
+;;; setup-ocaml.el -*- lexical-binding: t; -*-
+;; Time-stamp: <2018-08-15 03:05:00 csraghunandan>
+
+;; Copyright (C) 2016-2018 Chakravarthy Raghunandan
+;; Author: Chakravarthy Raghunandan <rnraghunandan@gmail.com>
 
 ;; configuration for OCaml mode
 
@@ -11,7 +15,6 @@
   (use-package tuareg
     :mode (("\\.ml[ily]?$" . tuareg-mode)
            ("\\.topml$" . tuareg-mode))
-    :defer t
     :init
     (add-hook 'tuareg-mode-hook (lambda ()
                                   (abbrev-mode -1)))
@@ -38,7 +41,8 @@
 
     (defun my-ocaml-mode-hook()
       (set (make-local-variable 'company-backends)
-           '((merlin-company-backend company-files company-yasnippet))))
+           '((merlin-company-backend company-files :with company-yasnippet)
+             (company-dabbrev-code company-dabbrev))))
     (add-hook 'tuareg-mode-hook #'my-ocaml-mode-hook)
     (add-hook 'tuareg-mode-hook 'company-mode))
 

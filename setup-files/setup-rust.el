@@ -1,17 +1,18 @@
-;; Time-stamp: <2018-05-14 21:57:14 csraghunandan>
+;;; setup-rust.el -*- lexical-binding: t; -*-
+;; Time-stamp: <2018-12-14 01:02:33 csraghunandan>
+
+;; Copyright (C) 2016-2018 Chakravarthy Raghunandan
+;; Author: Chakravarthy Raghunandan <rnraghunandan@gmail.com>
 
 ;; rust-mode, RLS, cargo
 
-;; lsp-rust: Rust support for lsp-mode using the Rust Language Server.
-;; https://github.com/emacs-lsp/lsp-rust
-(use-package lsp-rust)
-
 ;; rust-mode: major-mode for editing rust files
 ;; https://github.com/rust-lang/rust-mode
-(use-package rust-mode :defer t
+(use-package rust-mode
   :hook ((rust-mode . (lambda ()
-                        (lsp-rust-enable)
-                        (lsp-ui-mode)
+                        (lsp)
+                        (lsp-ui-doc-mode)
+                        (lsp-ui-sideline-mode)
                         (eldoc-mode)
                         (flycheck-mode)
                         (smart-dash-mode)
@@ -21,15 +22,13 @@
          ("C-c v t" . wh/rust-toggle-visibility)
          ("C-c m t" . wh/rust-toggle-mutability)
          ("C-c v s" . wh/rust-vec-as-slice))
-  :ensure-system-package
-  ((rustfmt . "rustup component add rustfmt-preview")
-   (racer . "cargo install racer")
-   (rls . "rustup component add rls-preview rust-analysis rust-src"))
   :config
+  (setq rust-indent-method-chain t)
 
   (defun my-rust-mode-hook ()
     (set (make-local-variable 'company-backends)
-         '((company-lsp company-yasnippet company-files))))
+         '((company-lsp company-files :with company-yasnippet)
+           (company-dabbrev-code company-dabbrev))))
   (add-hook 'rust-mode-hook #'my-rust-mode-hook)
 
   ;; format rust buffers using rustfmt(if it is installed)

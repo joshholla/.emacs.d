@@ -1,13 +1,17 @@
-;; -*- lexical-binding: t -*-
-;; Time-stamp: <2018-05-02 13:17:25 csraghunandan>
+;;; setup-dired.el -*- lexical-binding: t -*-
+;; Time-stamp: <2018-12-29 00:40:16 csraghunandan>
+
+;; Copyright (C) 2016-2018 Chakravarthy Raghunandan
+;; Author: Chakravarthy Raghunandan <rnraghunandan@gmail.com>
 
 ;; dired: file system manager for emacs
 (use-package dired :ensure nil
-  :bind (:map dired-mode-map
-              ("S" . ora-dired-get-size)
-              ("E" . ora-ediff-files)
-              ("^" . rag/dired-up-dir)
-              ("C-a" . dired-back-to-start-of-files))
+  :bind (("C-c r d" . bjm/ivy-dired-recent-dirs)
+         (:map dired-mode-map
+               ("S" . ora-dired-get-size)
+               ("E" . ora-ediff-files)
+               ("^" . rag/dired-up-dir)
+               ("C-a" . dired-back-to-start-of-files)))
   :config
   (progn
     ;; follow symlinks in dired
@@ -26,6 +30,9 @@
     (setq dired-recursive-deletes 'always)
     ;; makes dired guess the target directory
     (setq dired-dwim-target t)
+
+    (>=e "27.0"
+        (setq dired-create-destination-dirs t))
 
     ;; Dired listing switches
     ;;  -a : Do not ignore entries starting with .
@@ -50,18 +57,52 @@ It added extra strings at the front and back of the default dired buffer name."
 
     (add-hook 'dired-mode-hook #'rag/dired-rename-buffer-name))
 
-  (defvar du-program-name (executable-find "du"))
+  ;;* rest
   (defun ora-dired-get-size ()
-    "Get the size of a folder recursively"
     (interactive)
-    (let ((files (dired-get-marked-files)))
-      (with-temp-buffer
-        (apply 'call-process du-program-name nil t nil "-sch" files)
-        (message
-         "Size of all marked files: %s"
-         (progn
-           (re-search-backward "\\(^[ 0-9.,]+[A-Za-z]+\\).*total$")
-           (match-string 1))))))
+    (let* ((cmd (concat "du -sch "
+                        (mapconcat (lambda (x) (shell-quote-argument (file-name-nondirectory x)))
+                                   (dired-get-marked-files) " ")))
+           (res (shell-command-to-string cmd)))
+      (if (string-match "\\(^[ 0-9.,]+[A-Za-z]+\\).*total$" res)
+          (message (match-string 1 res))
+        (error "unexpected output %s" res))))
+
+  ;; open recent directory, requires ivy (part of swiper)
+  ;; borrows from http://stackoverflow.com/questions/23328037/in-emacs-how-to-maintain-a-list-of-recent-directories
+  (defun bjm/ivy-dired-recent-dirs ()
+    "Present a list of recently used directories and open the selected one in dired"
+    (interactive)
+    (let ((recent-dirs
+           (delete-dups
+            (mapcar (lambda (file)
+                      (if (file-directory-p file) file (file-name-directory file)))
+                    recentf-list))))
+
+      (let ((dir (ivy-read "Directory: "
+                           recent-dirs
+                           :re-builder #'ivy--regex
+                           :sort nil
+                           :initial-input nil)))
+        (dired dir))))
+
+  (eval-after-load "recentf"
+    '(progn
+       (defun recentf-track-opened-file ()
+         "Insert the name of the dired or file just opened or written into the recent list."
+         (let ((buff-name (or buffer-file-name (and (derived-mode-p 'dired-mode) default-directory))))
+           (and buff-name
+                (recentf-add-file buff-name)))
+         ;; Must return nil because it is run from `write-file-functions'.
+         nil)
+
+       (defun recentf-track-closed-file ()
+         "Update the recent list when a file or dired buffer is killed.
+  That is, remove a non kept file from the recent list."
+         (let ((buff-name (or buffer-file-name (and (derived-mode-p 'dired-mode) default-directory))))
+           (and buff-name
+                (recentf-remove-if-non-kept buff-name))))
+       (add-hook 'dired-after-readin-hook 'recentf-track-opened-file)))
 
   ;; use the same buffer for going up a directory in dired
   (defun rag/dired-up-dir()
@@ -76,17 +117,24 @@ It added extra strings at the front and back of the default dired buffer name."
           (let ((file1 (car files))
                 (file2 (if (cdr files)
                            (cadr files)
-                         (read-file-name
-                          "file: "
-                          (dired-dwim-target-directory)))))
-            (if (file-newer-than-file-p file1 file2)
-                (ediff-files file2 file1)
-              (ediff-files file1 file2))
-            (add-hook 'ediff-after-quit-hook-internal
-                      (lambda ()
-                        (setq ediff-after-quit-hook-internal nil)
-                        (set-window-configuration wnd))))
-        (error "no more than 2 files should be marked"))))
+                         (read-file-name "file: "
+                                         (dired-dwim-target-directory)))))
+            (when (file-newer-than-file-p file1 file2)
+              (cl-rotatef file1 file2))
+            (if (string-match "current ar archive" (shell-command-to-string (format "file %s" file1)))
+                (async-shell-command
+                 (format "hexdump-diffuse %s %s"
+                         (shell-quote-argument file1)
+                         (shell-quote-argument file2)))
+              (ediff-files file1 file2)
+              (add-hook 'ediff-after-quit-hook-internal
+                        (lambda ()
+                          (setq ediff-after-quit-hook-internal nil)
+                          (set-window-configuration wnd)))))
+        (error "no more than 2 files should be marked")))
+
+    (setq dired-garbage-files-regexp
+          "\\.idx\\|\\.run\\.xml$\\|\\.bbl$\\|\\.bcf$\\|.blg$\\|-blx.bib$\\|.nav$\\|.snm$\\|.out$\\|.synctex.gz$\\|\\(?:\\.\\(?:aux\\|bak\\|dvi\\|log\\|orig\\|rej\\|toc\\|pyg\\)\\)\\'"))
 
   ;; dired-x: to hide uninteresting files in dired
   (use-package dired-x :ensure nil
@@ -99,15 +147,20 @@ It added extra strings at the front and back of the default dired buffer name."
     (setq dired-omit-files
           (concat dired-omit-files "\\|^.DS_STORE$\\|^.projectile$\\|^.git$"))))
 
-;; dired-collapse: collapse unique nested paths in dired listing
-;; https://github.com/Fuco1/dired-hacks#dired-collapse
-(use-package dired-collapse
-  :hook ((dired-mode . dired-collapse-mode)))
-
 ;; diredfl:Extra Emacs font lock rules for a more colourful dired
 ;; https://github.com/purcell/diredfl/tree/085eabf2e70590ec8e31c1e66931d652d8eab432
 (use-package diredfl
   :config (diredfl-global-mode))
+
+;; adds treemacs icons to dired buffers
+;; https://github.com/Alexander-Miller/treemacs/blob/master/src/extra/treemacs-icons-dired.el
+(use-package treemacs-icons-dired
+  :after treemacs dired
+  :config (treemacs-icons-dired-mode))
+
+(use-package wdired :defer t
+  :ensure nil
+  :config (setq wdired-allow-to-change-permissions t))
 
 ;; dired-quick-sort: hydra to sort files in dired
 ;; Press `S' to invoke dired-quick-sort hydra

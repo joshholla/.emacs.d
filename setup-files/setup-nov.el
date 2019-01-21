@@ -1,4 +1,8 @@
-;; Time-stamp: <2018-03-13 11:05:46 csraghunandan>
+;;; setup-nov.el -*- lexical-binding: t; -*-
+;; Time-stamp: <2018-08-15 03:04:46 csraghunandan>
+
+;; Copyright (C) 2016-2018 Chakravarthy Raghunandan
+;; Author: Chakravarthy Raghunandan <rnraghunandan@gmail.com>
 
 ;; nov: Epub reader for emacs
 ;; https://github.com/wasamasa/nov.el

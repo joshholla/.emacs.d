@@ -1,8 +1,12 @@
-;; Time-stamp: <2018-01-26 00:23:34 csraghunandan>
+;;; setup-bookmark.el -*- lexical-binding: t; -*-
+;; Time-stamp: <2018-12-30 01:13:57 csraghunandan>
+
+;; Copyright (C) 2016-2018 Chakravarthy Raghunandan
+;; Author: Chakravarthy Raghunandan <rnraghunandan@gmail.com>
 
 ;; bm: visible bookmarks within a buffer
 ;; https://github.com/joodland/bm
-(use-package bm
+(use-package bm :defer t
   :config
   ;; buffer persistence on by default
   (setq-default bm-buffer-persistence t)
@@ -70,7 +74,7 @@ Bookmark _n_ext (_N_ in lifo order)            toggle book_m_ark        ^^_/_ bm
 ;; headlong: allows to easily jump to bookmarks
 ;; http://oremacs.com/2015/01/06/rushing-headlong/
 (use-package headlong
-  :bind (("s-b" . headlong-bookmark-jump)))
+  :bind (("H-b" . headlong-bookmark-jump)))
 
 ;; load bookmark list
 (bookmark-bmenu-list)

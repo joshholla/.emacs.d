@@ -1,30 +1,32 @@
-;;; -*- lexical-binding: t -*-
-;; Time-stamp: <2018-05-13 18:55:34 csraghunandan>
+;;; setup-counsel.el -*- lexical-binding: t -*-
+;; Time-stamp: <2018-12-14 01:53:32 csraghunandan>
+
+;; Copyright (C) 2016-2018 Chakravarthy Raghunandan
+;; Author: Chakravarthy Raghunandan <rnraghunandan@gmail.com>
 
 ;; counsel: ivy backends for a lot more commands
 ;; https://github.com/abo-abo/swiper
 (use-package counsel
   :after ivy
-  :bind* (([remap execute-extended-command] . counsel-M-x))
   :chords (("JJ" . counsel-imenu)
            (";'" . counsel-M-x))
-  :init
+  :defer 0.5
+  :bind
+  (:map read-expression-map
+        ("C-r" . counsel-expression-history))
+  :config
+
   (counsel-mode)
-
-  (bind-keys
-   :map read-expression-map
-   ("C-r" . counsel-expression-history))
-
   (with-eval-after-load 'org-agenda
     (bind-key "C-c C-q" #'counsel-org-tag-agenda org-agenda-mode-map))
 
-  :config
-
   (if (executable-find "rg")
       ;; if rg is installed, use rg for `counsel-grep-or-swiper' and `counsel-rg'
-      (setq counsel-grep-base-command "rg -i -M 120 --no-heading --line-number --color never '%s' %s"
+      (setq counsel-grep-base-command "rg --line-number --smart-case -M 150 --color never --mmap --no-heading %s %s"
             ;; add `--follow' option to allow search through symbolic links
-            counsel-rg-base-command "rg --line-number --color never -i --follow --mmap --no-heading %s")
+            counsel-rg-base-command "rg --line-number --smart-case -M 150 --color never --follow --mmap --no-heading %s"
+            ;; Use ripgrep for counsel-git
+            counsel-git-cmd "rg --files")
     ;; ignore case sensitivity for counsel grep
     (setq counsel-grep-base-command "grep -nEi \"%s\" %s"))
 
@@ -44,14 +46,36 @@
 
   (ivy-add-actions
    'counsel-find-file
-   `(("m" ,(reloading (given-file #'rename-file "Move")) "move")
-     ("d" ,(reloading #'confirm-delete-file) "delete")))
+   `(("p" (lambda (path) (with-ivy-window (insert (file-relative-name path default-directory)))) "insert relative path")
+     ("P" (lambda (path) (with-ivy-window (insert path))) "insert absolute path")
+     ("l" (lambda (path) "Insert org-link with relative path"
+            (with-ivy-window (insert (format "[[./%s]]" (file-relative-name path default-directory))))) "insert org-link (rel. path)")
+     ("L" (lambda (path) "Insert org-link with absolute path"
+            (with-ivy-window (insert (format "[[%s]]" path)))) "insert org-link (abs. path)")))
 
   (ivy-add-actions
    'counsel-projectile-find-file
-   `(("d" ,(reloading #'confirm-delete-file) "delete")
-     ("m" ,(reloading (given-file #'rename-file "Move")) "move")
+   `(("m" ,(reloading (given-file #'rename-file "Move")) "move")
      ("b" counsel-find-file-cd-bookmark-action "cd bookmark")))
+
+  ;;;###autoload
+  (defun +ivy-git-grep-other-window-action (x)
+    "Opens the current candidate in another window."
+    (when (string-match "\\`\\(.*?\\):\\([0-9]+\\):\\(.*\\)\\'" x)
+      (select-window
+       (with-ivy-window
+         (let ((file-name   (match-string-no-properties 1 x))
+               (line-number (match-string-no-properties 2 x)))
+           (find-file-other-window (expand-file-name file-name (ivy-state-directory ivy-last)))
+           (goto-char (point-min))
+           (forward-line (1- (string-to-number line-number)))
+           (re-search-forward (ivy--regex ivy-text t) (line-end-position) t)
+           (run-hooks 'counsel-grep-post-action-hook)
+           (selected-window))))))
+
+  (ivy-add-actions
+   'counsel-ag ; also applies to `counsel-rg' & `counsel-pt'
+   '(("O" +ivy-git-grep-other-window-action "open in other window")))
 
   ;; find file at point
   (setq counsel-find-file-at-point t)
@@ -64,16 +88,18 @@
          ;; File names ending with # or ~
          "\\|\\(?:\\`.+?[#~]\\'\\)"))
 
+  (setq counsel-mode-override-describe-bindings t
+        counsel-describe-function-function 'helpful-function
+        counsel-describe-variable-function 'helpful-variable)
+
+  (setq counsel-grep-post-action-hook '(recenter))
+
   (bind-keys
-   ([remap describe-bindings] . counsel-descbinds)
-   ([remap finder-by-keyword] . counsel-package) ;C-h p
-   ([remap bookmark-jump] . counsel-bookmark) ;Jump to book or set it if it doesn't exist, C-x r b
-   ([remap bookmark-set] . counsel-bookmark)  ;C-x r m
-   ([remap find-file] . counsel-find-file)
-   ("C-c g g" . counsel-git-grep)
+   ([remap finder-by-keyword] . counsel-package) ; C-h p
+   ([remap bookmark-set] . counsel-bookmark)
+   ([remap info-lookup-symbol] . counsel-info-lookup-symbol)
    ("C-c d s" . describe-symbol)
    ("C-c d f" . counsel-faces)
-   ("C-c d d" . counsel-descbinds)
    ("C-c r g" . counsel-rg)))
 
 ;; Add more ivy features for projectile related commands
@@ -94,7 +120,7 @@
 ;; `counsel-yank-pop' -> access the kill ring using ivy
 ;; `counsel-unicode-char' -> search through Unicode characters using ivy
 ;; `counsel-rg' -> search the all files in the current directory using `ripgrep'
-;; `counsel-descbinds' -> lists all the key bindings in the current buffer
+;; `counsel-descbinds' -> lists all the key bindings in the current buffer `C-h b'
 ;; `counsel-mark-ring' -> access the mark ring for the current buffer using ivy
 ;; `counsel-faces' -> lists all the face colours in emacs
 ;; `counsel-ibuffer' -> run swiper search on content
@@ -105,3 +131,4 @@
 ;; `counsel-org-agenda-headlines' -> search headings of all the files in org agenda list
 ;; `counsel-org-file' -> browse through all the attachments for a given org file
 ;; `counsel-yank-directory' -> yank the current directory in minibuffer with `C-M-y'
+;; `counsel-bookmark' -> Jump to book or set it if it doesn't exist, C-x r b

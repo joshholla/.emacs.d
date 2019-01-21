@@ -1,4 +1,8 @@
-;; Time-stamp: <2018-05-14 21:56:23 csraghunandan>
+;;; setup-haskell.el -*- lexical-binding: t; -*-
+;; Time-stamp: <2018-12-13 19:56:04 csraghunandan>
+
+;; Copyright (C) 2016-2018 Chakravarthy Raghunandan
+;; Author: Chakravarthy Raghunandan <rnraghunandan@gmail.com>
 
 ;; haskell-mode: major mode for editing haskell files
 ;; https://github.com/haskell/haskell-mode
@@ -8,12 +12,14 @@
                      (intero-mode)
                      (my-haskell-mode-hook)
                      (company-mode)
-                     (setq haskell-indentation-mode nil))))
+                     (setq haskell-indentation-mode nil)
+                     (haskell-collapse-mode))))
   :config
   (defun my-haskell-mode-hook ()
     "Hook for `haskell-mode'."
     (set (make-local-variable 'company-backends)
-         '((company-intero company-files company-yasnippet))))
+         '((company-intero company-files :with company-yasnippet)
+           (company-dabbrev-code company-dabbrev))))
 
 ;; structured-haskell-mode: paredit like features for haskell code
 ;; https://github.com/chrisdone/structured-haskell-mode
@@ -35,7 +41,6 @@
 ;; commercialhaskell.github.io/intero
 (use-package intero
   :after haskell-mode
-  :ensure-system-package (hlint . "stack install hlint")
   :config
   ;; enable hlint checker for flycheck
   (flycheck-add-next-checker 'intero
@@ -44,17 +49,25 @@
 ;; hlint-refactor:Emacs bindings for hlint's --refactor option
 ;; https://github.com/mpickering/hlint-refactor-mode
 (use-package hlint-refactor
-  :ensure-system-package (refactor . "stack install apply-refact")
   :hook (haskell-mode . hlint-refactor-mode))
 
 ;; hindent: format haskell code automatically
 ;; https://github.com/chrisdone/hindent
 (use-package hindent
-  :ensure-system-package (hindent . "stack install hindent")
   :hook (haskell-mode . hindent-mode)
   :config
   ;; reformat the buffer using hindent on save
-  (setq hindent-reformat-buffer-on-save t))
+  (setq hindent-reformat-buffer-on-save t)
+
+  ;; Suppress errors when hindent--before-save fails
+  (with-eval-after-load 'hindent
+    (when (require 'nadvice)
+      (defun mu-hindent--before-save-wrapper (oldfun &rest args)
+        (with-demoted-errors "Error invoking hindent: %s"
+          (let ((debug-on-error nil))
+            (apply oldfun args))))
+      (advice-add
+       'hindent--before-save :around 'mu-hindent--before-save-wrapper))))
 
 (provide 'setup-haskell)
 

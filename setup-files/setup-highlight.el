@@ -1,4 +1,8 @@
-;; Time-stamp: <2018-05-16 23:10:56 csraghunandan>
+;;; setup-highlight.el -*- lexical-binding: t; -*-
+;; Time-stamp: <2019-01-08 11:57:51 csraghunandan>
+
+;; Copyright (C) 2016-2018 Chakravarthy Raghunandan
+;; Author: Chakravarthy Raghunandan <rnraghunandan@gmail.com>
 
 ;; All the highlight stuff config
 
@@ -26,11 +30,13 @@
 ;; https://github.com/Malabarba/beacon
 (use-package beacon
   :config
+  (setq beacon-size 15)
   (beacon-mode)
-  (setq beacon-size 25)
+
   ;; don't blink in shell-mode
-  (add-to-list 'beacon-dont-blink-major-modes #'comint-mode)
-  (add-to-list 'beacon-dont-blink-major-modes #'term-mode))
+  (add-to-list 'beacon-dont-blink-major-modes #'comint-mode t)
+  (add-to-list 'beacon-dont-blink-major-modes #'term-mode t)
+  (add-to-list 'beacon-dont-blink-major-modes #'sql-interactive-mode t))
 
 ;; highlight-numbers: fontify numbers
 ;; https://github.com/Fanael/highlight-numbers
@@ -43,8 +49,17 @@
   :hook ((prog-mode . highlight-indent-guides-mode))
   :config
   (setq highlight-indent-guides-method 'character)
+  (setq highlight-indent-guides-character ?\ǀ)
   (setq highlight-indent-guides-responsive 'top)
-  (setq highlight-indent-guides-delay 0.05))
+
+  ;; https://github.com/DarthFennec/highlight-indent-guides/issues/40#issuecomment-451553492
+  (defadvice ivy-cleanup-string (after my-ivy-cleanup-hig activate)
+    (let ((pos 0) (next 0) (limit (length str)) (prop 'highlight-indent-guides-prop))
+      (while (and pos next)
+        (setq next (text-property-not-all pos limit prop nil str))
+        (when next
+          (setq pos (text-property-any next limit prop nil str))
+          (remove-text-properties next pos '(display nil face nil) str))))))
 
 ;; hl-todo: Highlight TODO keywords
 ;; https://github.com/tarsius/hl-todo/tree/master

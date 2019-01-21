@@ -1,35 +1,35 @@
-;; Time-stamp: <2018-05-13 13:58:48 csraghunandan>
+;;; setup-js.el -*- lexical-binding: t; -*-
+;; Time-stamp: <2018-12-13 19:53:29 csraghunandan>
+
+;; Copyright (C) 2016-2018 Chakravarthy Raghunandan
+;; Author: Chakravarthy Raghunandan <rnraghunandan@gmail.com>
 
 ;; JavaScript configuration
 
 ;; js2-mode: enhanced JavaScript editing mode
 ;; https://github.com/mooz/js2-mode
 (use-package js2-mode
-  :mode
-  (("\\.js$" . js2-mode)
-   ("\\.jsx$" . js2-jsx-mode))
+  :mode (("\\.js$" . js2-mode))
   :hook ((js2-mode . (lambda ()
                        (flycheck-mode)
                        (my-tide-setup-hook)
-                       (company-mode)))
-         (js2-jsx-mode . (lambda ()
-                           (flycheck-mode)
-                           (my-tide-setup-hook)
-                           (company-mode))))
-  :ensure-system-package ((prettier . "npm i -g prettier")
-                          (eslint . "npm i -g eslint")
-                          (eslint_d . "npm i -g eslint_d"))
+                       (company-mode))))
   :config
   ;; have 2 space indentation by default
-  (setq-default js-indent-level 2)
-  (setq-default js2-basic-offset 2)
+  (setq js-indent-level 2
+        js2-basic-offset 2
+        js-chain-indent t)
 
   ;; use eslint_d insetad of eslint for faster linting
   (setq flycheck-javascript-eslint-executable "eslint_d")
 
+  ;; Try to highlight most ECMA built-ins
+  (setq js2-highlight-level 3)
+
   ;; turn off all warnings in js2-mode
   (setq js2-mode-show-parse-errors t)
   (setq js2-mode-show-strict-warnings nil)
+  (setq js2-strict-missing-semi-warning nil)
 
   (defun my-tide-setup-hook ()
     ;; configure tide
@@ -46,7 +46,8 @@
 
     ;; company-backends setup
     (set (make-local-variable 'company-backends)
-         '((company-tide company-files company-yasnippet)))
+         '((company-tide company-files :with company-yasnippet)
+           (company-dabbrev-code company-dabbrev)))
 
     ;; configure javascript-tide checker to run after your default javascript checker
     (flycheck-add-next-checker 'javascript-eslint 'javascript-tide 'append)))
@@ -105,7 +106,7 @@
 ;; https://github.com/prettier/prettier-emacs
 (use-package prettier-js
   :hook ((js2-mode . prettier-js-mode)
-         (js2-jsx-mode . prettier-js-mode)))
+         (rjsx-mode . prettier-js-mode)))
 
 ;; json-snatcher: get the path of any JSON element easily
 ;; https://github.com/Sterlingg/json-snatcher
@@ -123,7 +124,7 @@
   :after js2-mode
   :bind (:map js2-mode-map
               ("C-c C-l" . indium-eval-buffer))
-  :hook ((js2-mode . indium-interaction-mode)))
+  :hook (((js2-mode typescript-mode) . indium-interaction-mode)))
 
 ;; mocha: emacs mode for running mocha tests
 ;; https://github.com/scottaj/mocha.el
@@ -146,15 +147,44 @@
 ;; https://github.com/codesuki/add-node-modules-path/tree/master
 (use-package add-node-modules-path
   :hook ((js2-mode . add-node-modules-path)
-         (js2-jsx-mode . add-node-modules-path)))
+         (rjsx-mode . add-node-modules-path)))
 
 ;; json-mode: Major mode for editing JSON files with emacs
 ;; https://github.com/joshwnj/json-mode
 (use-package json-mode
+  :mode "\\.js\\(?:on\\|[hl]int\\(rc\\)?\\)\\'"
   :config
   (add-hook 'json-mode-hook #'prettier-js-mode)
   (setq json-reformat:indent-width 2)
   (setq json-reformat:pretty-string? t)
   (setq js-indent-level 2))
+
+;; eslintd-fix: Emacs minor-mode to automatically fix javascript with eslint_d.
+;; https://github.com/aaronjensen/eslintd-fix/tree/master
+(use-package eslintd-fix)
+
+;; rjsx-mode: A JSX major mode for Emacs
+;; https://github.com/felipeochoa/rjsx-mode
+(use-package rjsx-mode
+  :after js2-mode
+  :mode (("\\.jsx$" . rjsx-mode)
+         ("components/.+\\.js$" . rjsx-mode))
+  :hook (rjsx-mode . (lambda ()
+                          (flycheck-mode)
+                          (my-tide-setup-hook)
+                          (company-mode)
+                          (indium-interaction-mode -1)
+                          (js2-refactor-mode -1)))
+  :init
+  (defun +javascript-jsx-file-p ()
+    "Detect React or preact imports early in the file."
+    (and buffer-file-name
+         (string= (file-name-extension buffer-file-name) "js")
+         (re-search-forward "\\(^\\s-*import +React\\|\\( from \\|require(\\)[\"']p?react\\)"
+                            magic-mode-regexp-match-limit t)
+         (progn (goto-char (match-beginning 1))
+                (not (sp-point-in-string-or-comment)))))
+  (add-to-list 'magic-mode-alist '(+javascript-jsx-file-p . rjsx-mode))
+  :config (unbind-key "C-c C-l" rjsx-mode-map))
 
 (provide 'setup-js)

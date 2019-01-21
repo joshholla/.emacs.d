@@ -1,4 +1,8 @@
-;; Time-stamp: <2018-03-13 12:01:17 csraghunandan>
+;;; setup-elisp-mode.el -*- lexical-binding: t; -*-
+;; Time-stamp: <2018-08-15 02:55:50 csraghunandan>
+
+;; Copyright (C) 2016-2018 Chakravarthy Raghunandan
+;; Author: Chakravarthy Raghunandan <rnraghunandan@gmail.com>
 
 ;; emacs-lisp-mpde
 ;; configure company mode for emacs-lisp-mode
@@ -9,7 +13,8 @@
   (defun my-elisp-mode-hook ()
     "Hook for `emacs-lisp-mode'"
     (set (make-local-variable 'company-backends)
-         '((company-capf company-yasnippet company-files))))
+         '((company-capf company-files :with company-yasnippet)
+           (company-dabbrev-code company-dabbrev))))
   (add-hook 'emacs-lisp-mode-hook 'my-elisp-mode-hook)
   (add-hook 'emacs-lisp-mode-hook 'company-mode)
 

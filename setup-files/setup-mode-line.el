@@ -1,27 +1,30 @@
 ;; Time-stamp: <2018-05-26 21:45:06 joshuaholla>
 
+;; Copyright (C) 2016-2018 Chakravarthy Raghunandan
+;; Author: Chakravarthy Raghunandan <rnraghunandan@gmail.com>
+
 ;; flash the modeline instead of ringing the bell
 ;; https://github.com/purcell/mode-line-bell
 (use-package mode-line-bell
   :defer 1
   :config (mode-line-bell-mode))
 
+;; Custom Eyebrowse mode-line indicator
 (defvar mu-eyebrowse-mode-line
   '(:propertize
     (:eval
-     (when (and (bound-and-true-p eyebrowse-mode)
-                (< 1 (length (eyebrowse--get 'window-configs))))
+     (when (bound-and-true-p eyebrowse-mode)
        (let* ((num (eyebrowse--get 'current-slot))
               (tag (when num
                      (nth 2 (assoc num (eyebrowse--get 'window-configs)))))
               (str (concat
-                    " "
+                    "  "
                     (if (and tag (< 0 (length tag)))
                         tag
                       (when num (int-to-string num)))
                     " ")))
          str)))
-    face (:background "#81a2be" :foreground "#373b41"))
+    face (:weight bold))
   "Mode line format for Eyebrowse.")
 
 (put 'mu-eyebrowse-mode-line 'risky-local-variable t)
@@ -54,7 +57,12 @@
   (moody-replace-mode-line-buffer-identification)
   (moody-replace-vc-mode)
   (column-number-mode)
-  (size-indication-mode))
+  (size-indication-mode)
+
+  ;; display date and time
+  (setq display-time-format "%a-%d %H:%M")
+  (setq display-time-default-load-average nil)
+  (display-time-mode))
 
 ;; A minor-mode menu for the mode line
 ;; https://github.com/tarsius/minions
@@ -78,3 +86,21 @@
 ;; (use-package nyan-mode :ensure t)
 
 (provide 'setup-mode-line)
+
+;; Variables used in display-time-format
+;; http://docs.splunk.com/Documentation/Splunk/5.0.2/SearchReference/Commontimeformatvariables
+;;
+;; | %y | year in numbers (2-digit)                   |
+;; | %Y | year in numbers (4-digit)                   |
+;; | %m | month in number (eg: 12)                    |
+;; | %B | full month name (eg: December)              |
+;; | %b | short month name (eg: Dec)                  |
+;; | %d | day in numbers, with leading zeros (eg: 08) |
+;; | %e | day in numbers, no leading zeros (eg: 8)    |
+;; | %A | full weekday name (eg: Sunday)              |
+;; | %a | short weekday name (eg: Sun)                |
+;; | %H | hours in 24-clock, with leading zeros       |
+;; | %k | hours in 24-clock, no leading zeros         |
+;; | %l | hours in 12-clock, with leading zeros       |
+;; | %p | am/pm                                       |
+;; | %T | time in 24-hour notation (%H:%M:%S)         |

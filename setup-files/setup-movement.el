@@ -1,4 +1,8 @@
-;; Time-stamp: <2018-04-12 18:06:40 csraghunandan>
+;;; setup-movement.el -*- lexical-binding: t; -*-
+;; Time-stamp: <2018-08-15 03:04:38 csraghunandan>
+
+;; Copyright (C) 2016-2018 Chakravarthy Raghunandan
+;; Author: Chakravarthy Raghunandan <rnraghunandan@gmail.com>
 
 ;; All the configuration related to movement in emacs
 
@@ -17,11 +21,9 @@ Try the repeated popping up to 10 times."
 
 ;; Horizontally scroll only the current line
 ;; https://www.reddit.com/r/emacs/comments/6au45k/is_it_possible_to_truncate_long_lines_the_same/
-(>=e "26.0"
-    (setq auto-hscroll-mode 'current-line))
+(setq auto-hscroll-mode 'current-line)
 
-(>=e "25.0"
-    (setq fast-but-imprecise-scrolling t))
+(setq fast-but-imprecise-scrolling t)
 
 ;; mwim: move to the beginning or end of line smartly
 ;; https://github.com/alezost/mwim.el
@@ -89,7 +91,9 @@ _S_: <- sentence    _A_: <- paragraph    _G_: <- page       _<_: beginning-of-bu
 ;; A simple-minded way of managing window configs in emacs
 ;; https://github.com/wasamasa/eyebrowse
 (use-package eyebrowse
-  :config (eyebrowse-mode t))
+  :config
+  (eyebrowse-mode t)
+  (setq eyebrowse-mode-line-style nil))
 
 (setq recenter-positions '(0.50 0.07 0.93)) ;default: '(middle top bottom)
 ;; First C-l  -> 0.50: Put point vertically at the middle of the window

@@ -1,10 +1,14 @@
-;; Time-stamp: <2018-05-13 19:45:59 csraghunandan>
+;;; setup-calendar.el -*- lexical-binding: t; -*-
+;; Time-stamp: <2018-12-30 01:14:09 csraghunandan>
+
+;; Copyright (C) 2016-2018 Chakravarthy Raghunandan
+;; Author: Chakravarthy Raghunandan <rnraghunandan@gmail.com>
 
 ;; calendar config
-(use-package calendar :defer t
+(use-package calendar
   :ensure nil
   :hook ((calendar-today-visible . calendar-mark-today))
-  :bind (("s-d" . help/hydra/timestamp/body))
+  :bind (("H-d" . help/hydra/timestamp/body))
   :config
   (defhydra help/hydra/timestamp (:color blue :hint nil)
     "

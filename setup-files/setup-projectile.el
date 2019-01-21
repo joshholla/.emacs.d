@@ -1,10 +1,16 @@
-;; Time-stamp: <2018-04-25 08:53:58 csraghunandan>
+;;; setup-projectile.el -*- lexical-binding: t; -*-
+;; Time-stamp: <2018-11-24 18:57:21 csraghunandan>
+
+;; Copyright (C) 2016-2018 Chakravarthy Raghunandan
+;; Author: Chakravarthy Raghunandan <rnraghunandan@gmail.com>
 
 ;; Projectile: Project Interaction Library for Emacs
 ;; https://github.com/bbatsov/projectile
-(use-package projectile
-  :defer 1
+(use-package projectile :defer 1
   :config
+  ;; Set the projectile-prefix-command binding
+  (bind-key "C-c p" 'projectile-command-map projectile-mode-map)
+
   (setq projectile-completion-system 'ivy
         projectile-enable-caching t)
 
@@ -17,31 +23,16 @@
     (f-descendant-of? project-root (expand-file-name "~/exercism")))
   (setq projectile-ignored-project-function #'my-projectile-ignore-project)
 
-
+  ;; ignore some common files for projectile
+  (setq projectile-globally-ignored-file-suffixes '(".elc" ".pyc" ".o")
+        projectile-globally-ignored-files '(".DS_Store" "Icon" "TAGS"))
 
-;;; Default rg arguments
-  ;; https://github.com/BurntSushi/ripgrep
-  (when (executable-find "rg")
-    (progn
-      (defconst modi/rg-arguments
-        `("--line-number" ; line numbers
-          "--follow" ; follow symlinks
-          "--color never"
-          "--max-columns 150"        ;Emacs doesn't handle long line lengths very well
-          "--mmap") ; apply memory map optimization when possible
-        "Default rg arguments used in the functions in `projectile' package.")
+  ;; include the project root directory in projectile-find-dir list
+  (setq projectile-find-dir-includes-top-level t)
 
-      (defun modi/advice-projectile-use-rg ()
-        "Always use `rg' for getting a list of all files in the project."
-        (mapconcat 'identity
-                   (append '("\\rg") ; used unaliased version of `rg': \rg
-                           modi/rg-arguments
-                           '("--null" ; output null separated results,
-                             "--files")) ; get file names matching the regex '' (all files)
-                   " "))
+  ;; use turbo indexing method for proectile
+  (setq projectile-indexing-method 'alien)
 
-      (advice-add 'projectile-get-ext-command
-                  :override #'modi/advice-projectile-use-rg)))
 
 
   ;; Make the file list creation faster by NOT calling `projectile-get-sub-projects-files'
@@ -123,13 +114,15 @@ files in Fundamental mode."
 ;; projectile
 ;; This configuration uses `rg'(ripgrep) to generate the project list
 ;; * to clear the cache when searching for files in a project, prefix
-;;   `projectile-find-file' with `C-u'.
-;; * use `projectile-ibuffer' [C-c p I] to open `ibuffer' for the current project only
-;; * use `projectile-kill-buffers' [C-c p k] to kill all buffers related to a project
-;; * use `projectile-recentf' [C-c p e] to list all recently opened file in a project
-;; * use `projectile-switch-open-project' [C-c p q] to switch to an open project
-;; * use `projectile-replace-regexp' [C-c Q] to replace regexp in the project
-;; * use `projectile-find-dir' to select all the directories in a project
-;; * use `projectile-dired' to open the dired buffer of project root
-;; `projectile-edit-dir-locals' -> to edit the .dirlocals of the project
-;; `projectile-find-file-in-known-projects' -> to find file in all known projects
+;;   `counsel-projectile-find-file' with `C-u'.
+;; * `projectile-ibuffer' [C-c p I] to open `ibuffer' for the current project only
+;; * `projectile-kill-buffers' [C-c p k] to kill all buffers related to a project
+;; * `projectile-recentf' [C-c p e] to list all recently opened file in a project
+;; * `projectile-switch-open-project' [C-c p q] to switch to an open project
+;; * `projectile-replace-regexp' [C-c Q] to replace regexp in the project
+;; * `counsel-projectile-switch-to-buffer' [C-c p b] to open any open buffers for current project
+;; * `counsel-projectile-find-dir' [C-c p d] to find all the directories in a project
+;; * `counsel-projectile-find-file-dwim' [C-c p g] for dwim find file
+;; * `projectile-dired' [C-c p d] to open the dired buffer of project root
+;; * `projectile-edit-dir-locals' [C-c p E] -> to edit the .dirlocals of the project
+;; * `projectile-find-file-in-known-projects' [C-c p F] -> to find file in all known projects

@@ -1,4 +1,8 @@
-;; Time-stamp: <2018-05-13 19:22:09 csraghunandan>
+;;; setup-buffers.el -*- lexical-binding: t; -*-
+;; Time-stamp: <2018-12-30 01:13:49 csraghunandan>
+
+;; Copyright (C) 2016-2018 Chakravarthy Raghunandan
+;; Author: Chakravarthy Raghunandan <rnraghunandan@gmail.com>
 
 ;; configuration for buffers
 
@@ -13,11 +17,12 @@
 (use-package uniquify :ensure nil
   :defer 2
   :config
-  ;; make buffers with same name unique
   (setq uniquify-buffer-name-style 'forward)
   (setq uniquify-separator "/")
-  (setq uniquify-after-kill-buffer-p t)    ; rename after killing uniquified
-  (setq uniquify-ignore-buffers-re "^\\*")) ; don't muck with special buffers
+  ;; rename after killing uniquified
+  (setq uniquify-after-kill-buffer-p t)
+  ;; don't muck with special buffers
+  (setq uniquify-ignore-buffers-re "^\\*"))
 
 ;; make emacs auto-refresh all buffers when files have changed on the disk
 (global-auto-revert-mode t)
@@ -128,24 +133,7 @@ Emacs session."
           (find-file file)))
     (error "No recently-killed files to reopen")))
 
-;;; Kill/Bury Buffer
-
-;; http://git.savannah.gnu.org/cgit/emacs.git/commit/?id=2e4f4c9d48c563ff8bec102b66da0225587786c6
-(>=e "26.0"
-    nil  ;The `kill-current-buffer' command will be defined in core in emacs 26+
-  (defun kill-current-buffer ()
-    "Kill the current buffer.
-When called in the minibuffer, get out of the minibuffer
-using `abort-recursive-edit'.
-This is like `kill-this-buffer', but it doesn't have to be invoked
-via the menu bar, and pays no attention to the menu-bar's frame."
-    (interactive)
-    (let ((frame (selected-frame)))
-      (if (and (frame-live-p frame)
-             (not (window-minibuffer-p (frame-selected-window frame))))
-          (kill-buffer (current-buffer))
-        (abort-recursive-edit)))))
-
+;; Kill/Bury Buffer
 (defun modi/kill-buffer-dwim (kill-next-error-buffer)
   "Kill the current buffer.
 When called in the minibuffer, get out of the minibuffer
@@ -156,10 +144,8 @@ Examples of such buffers: *gtags-global*, *ag*, *Occur*, *Diff*."
   (if kill-next-error-buffer
       (kill-buffer (next-error-find-buffer :avoid-current))
     (kill-current-buffer)))
-(>=e "26.0"
-    (bind-key "C-x k" 'modi/kill-buffer-dwim))
-(>=e "26.0"
-    (bind-chord "XX" #'modi/kill-buffer-dwim))
+(bind-key "C-x k" 'modi/kill-buffer-dwim)
+(bind-chord "XX" #'modi/kill-buffer-dwim)
 
 ;;; Toggle between buffers
 ;; http://www.emacswiki.org/emacs/SwitchingBuffers
@@ -223,7 +209,7 @@ Examples of such buffers: *gtags-global*, *ag*, *Occur*, *Diff*."
  ("C-c r m" . modi/delete-current-buffer-file)
  ("C-c m v" . rename-file-and-buffer)
  ("C-c m d" . make-directory)
- ("s-u" . revert-buffer-no-confirm)
+ ("H-u" . revert-buffer-no-confirm)
  ("C-c s n" . modi/copy-buffer-file-name))
 
 (defun rag/split-below-and-move ()
@@ -360,14 +346,14 @@ will be killed."
 ;; beginend: Emacs package to redefine M-< and M-> for some modes
 ;; https://github.com/DamienCassou/beginend
 (use-package beginend
+  :hook (ivy-occur-grep-mode . beginend-ivy-occur-mode)
+  :init (beginend-global-mode)
   :config
-  (beginend-global-mode)
   (beginend-define-mode ivy-occur-mode
     (progn
       (ivy-occur-next-line 4))
     (progn
-      (ivy-occur-previous-line 1)))
-  (add-hook 'ivy-occur-grep-mode-hook #'beginend-ivy-occur-mode))
+      (ivy-occur-previous-line 1))))
 
 (defun duplicate-buffer (new-name)
   "Create a copy of the current buffer with the filename NEW-NAME.
@@ -410,5 +396,34 @@ narrowed."
         (t
          (narrow-to-defun))))
 (bind-key "C-x n n" #'endless/narrow-or-widen-dwim)
+
+;; Don't kill the important buffers
+(defconst mu-do-not-kill-buffer-names '("*scratch*" "*Messages*")
+  "Names of buffers that should not be killed.")
+
+;;;###autoload
+(defun mu-do-not-kill-important-buffers ()
+  "Inhibit killing of important buffers.
+Add this to `kill-buffer-query-functions'."
+  (if (not (member (buffer-name) mu-do-not-kill-buffer-names))
+      t
+    (message "Not allowed to kill %s, burying instead" (buffer-name))
+    (bury-buffer)
+    nil))
+
+;; Don't kill important buffers
+(add-hook 'kill-buffer-query-functions #'mu-do-not-kill-important-buffers)
+
+;; vlf: View large files without slowing emacs to a crawl
+;; https://github.com/m00natic/vlfi
+(use-package vlf :defer t
+  :config
+  (defun ffap-vlf ()
+    "Find file at point with VLF."
+    (interactive)
+    (let ((file (ffap-file-at-point)))
+      (unless (file-exists-p file)
+        (error "File does not exist: %s" file))
+      (vlf file))))
 
 (provide 'setup-buffers)

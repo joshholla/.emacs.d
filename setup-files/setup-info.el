@@ -1,4 +1,8 @@
-;; Time-stamp: <2018-02-06 12:03:07 csraghunandan>
+;;; setup-info.el -*- lexical-binding: t; -*-
+;; Time-stamp: <2018-08-15 02:58:38 csraghunandan>
+
+;; Copyright (C) 2016-2018 Chakravarthy Raghunandan
+;; Author: Chakravarthy Raghunandan <rnraghunandan@gmail.com>
 
 ;; info-colors: Extra colors for Emacs info-mode
 ;; https://github.com/ubolonton/info-colors/tree/a8ebb7b8efa314c08ea8110d8b1876afb562bb45

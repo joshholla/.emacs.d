@@ -1,20 +1,22 @@
-;; Time-stamp: <2018-05-10 17:20:27 csraghunandan>
+;;; setup-org.el -*- lexical-binding: t; -*-
+;; Time-stamp: <2018-12-30 01:14:31 csraghunandan>
+
+;; Copyright (C) 2016-2018 Chakravarthy Raghunandan
+;; Author: Chakravarthy Raghunandan <rnraghunandan@gmail.com>
 
 ;; Org-mode configuration - Make sure you install the latest org-mode with `M-x' RET `org-plus-contrib'
 ;; http://orgmode.org/
 (use-package org
-  :ensure org-plus-contrib
+  :ensure nil
   :preface
   ;; Modules that should always be loaded together with org.el.
   ;; `org-modules' default: '(org-w3m org-bbdb org-bibtex org-docview org-gnus
   ;;                          org-info org-irc org-mhe org-rmail)
-  (setq org-modules '(org-info org-irc org-drill org-habit org-gnus))
+  (setq org-modules '(org-info org-irc org-habit org-gnus))
 
   ;; Set my default org-export backends. This variable needs to be set before
   ;; org.el is loaded.
   (setq org-export-backends '(ascii html latex md gfm odt))
-
-  :mode ("\\.org\\'" . org-mode)
 
   :config
 
@@ -45,14 +47,16 @@
                              ("~/org/someday.org" :level . 1)
                              ("~/org/tickler.org" :maxlevel . 2)))
 
-  (add-to-list
-   'ivy-completing-read-handlers-alist
-   '(org-capture-refile . completing-read-default))
+  (with-eval-after-load "ivy"
+    (add-to-list
+    'ivy-completing-read-handlers-alist
+    '(org-capture-refile . completing-read-default)))
 
   ;; override `avy-goto-char-timer' to C-' in org-mode-map
   (bind-key "C-'" 'avy-goto-char-timer org-mode-map)
   (bind-key "C-c C-/" #'org-refile org-mode-map)
 
+  (bind-key "C-c M-a" #'ace-link-org org-mode-map)
   ;; add a tag to make ordered tasks more visible
   (setq org-track-ordered-property-with-tag t)
 
@@ -71,10 +75,6 @@
   ;; Show drawers, e.g. :PROPERTIES:, when we expand a heading.
   ;; See http://emacs.stackexchange.com/a/22540/304
   (remove-hook 'org-cycle-hook #'org-cycle-hide-drawers)
-
-  ;; Don't underline dates, it's distracting.
-  (custom-set-faces
-   '(org-date ((((class color)) (:underline nil))) t))
 
   ;; ob-rust: evaluate rust src blocks
   (use-package ob-rust)
@@ -95,9 +95,10 @@
      (python . t)
      (rust . t)))
 
+  (add-to-list
+   'org-src-lang-modes '("plantuml" . plantuml))
+
 ;;; Org Variables
-  ;; this looks better in my opinion
-  (set-face-attribute 'org-ellipsis nil :underline nil :foreground "#E0CF9F")
   ;; hide emphasis markup characters
   (setq org-hide-emphasis-markers t)
   ;; Non-nil means insert state change notes and time stamps into a drawer.
@@ -421,6 +422,55 @@ point."
                (rfloc (list nil filename nil pos)))
           (org-refile nil nil rfloc))))))
 
+  (defun has-space-at-boundary-p (string)
+    "Check whether STRING has any whitespace on the boundary.
+Return 'left, 'right, 'both or nil."
+    (let ((result nil))
+      (when (string-match-p "^[[:space:]]+" string)
+        (setq result 'left))
+      (when (string-match-p "[[:space:]]+$" string)
+        (if (eq result 'left)
+	        (setq result 'both)
+	      (setq result 'right)))
+      result))
+
+  (defun is-there-space-around-point-p ()
+    "Check whether there is whitespace around point.
+Return 'left, 'right, 'both or nil."
+    (let ((result nil))
+      (when (< (save-excursion
+                 (skip-chars-backward "[:space:]"))
+               0)
+        (setq result 'left))
+      (when (> (save-excursion
+                 (skip-chars-forward "[:space:]"))
+               0)
+        (if (eq result 'left)
+	        (setq result 'both)
+	      (setq result 'right)))
+      result))
+
+  (defun set-point-before-yanking (string)
+    "Put point in the appropriate place before yanking STRING."
+    (let ((space-in-yanked-string (has-space-at-boundary-p string))
+	      (space-at-point (is-there-space-around-point-p)))
+      (cond ((and (eq space-in-yanked-string 'left)
+		          (eq space-at-point 'left))
+	         (skip-chars-backward "[:space:]"))
+	        ((and (eq space-in-yanked-string 'right)
+		          (eq space-at-point 'right))
+	         (skip-chars-forward "[:space:]")))))
+
+  (defun set-point-before-yanking-if-in-text-mode (string)
+    "Invoke `set-point-before-yanking' in text modes."
+    (when (derived-mode-p 'text-mode)
+      (set-point-before-yanking string)))
+
+  (advice-add
+   'insert-for-yank
+   :before
+   #'set-point-before-yanking-if-in-text-mode)
+
   (defun bjm/org-agenda-item-to-top ()
     "Move the current agenda item to the top of the subtree in its file"
     (interactive)
@@ -451,6 +501,13 @@ point."
        (setq org-map-continue-from (outline-previous-heading)))
      "/CANCELLED" 'file))
 
+  ;; Re-align tags when window shape changes
+  (with-eval-after-load 'org-agenda
+              (add-hook 'org-agenda-mode-hook
+                        (lambda ()
+                          (add-hook 'window-configuration-change-hook
+                                    'org-agenda-align-tags nil t))))
+
   (defun rag/copy-id-to-clipboard()
     "Copy the ID property value to killring,
 if no ID is there then create a new unique ID.
@@ -464,7 +521,7 @@ text and copying to the killring."
       (setq mytmpid (funcall 'org-id-get-create))
       (kill-new mytmpid)
       (message "Copied %s to killring (clipboard)" mytmpid)))
-  (bind-key "s-i" 'rag/copy-id-to-clipboard org-mode-map)
+  (bind-key "H-i" 'rag/copy-id-to-clipboard org-mode-map)
 
   (bind-key "C-c h c" 'hydra-org-clock/body org-mode-map)
   (defhydra hydra-org-clock (:color blue
@@ -492,7 +549,123 @@ text and copying to the killring."
     ("s" org-timer-stop)
     ("m" org-timer)
     ("t" org-timer-item)
-    ("z" (org-info "Timers"))))
+    ("z" (org-info "Timers")))
+
+  ;; https://github.com/kaushalmodi/.emacs.d/blob/master/setup-files/setup-org.el#L330
+  (defun modi/org-in-any-block-p ()
+    "Return non-nil if the point is in any Org block.
+The Org block can be *any*: src, example, verse, etc., even any
+Org Special block.
+This function is heavily adapted from `org-between-regexps-p'."
+    (save-match-data
+      (let ((pos (point))
+            (case-fold-search t)
+            (block-begin-re "^[[:blank:]]*#\\+begin_\\(?1:.+?\\)\\(?: .*\\)*$")
+            (limit-up (save-excursion (outline-previous-heading)))
+            (limit-down (save-excursion (outline-next-heading)))
+            beg end)
+        (save-excursion
+          ;; Point is on a block when on BLOCK-BEGIN-RE or if
+          ;; BLOCK-BEGIN-RE can be found before it...
+          (and (or (org-in-regexp block-begin-re)
+                   (re-search-backward block-begin-re limit-up :noerror))
+               (setq beg (match-beginning 0))
+               ;; ... and BLOCK-END-RE after it...
+               (let ((block-end-re (concat "^[[:blank:]]*#\\+end_"
+                                           (match-string-no-properties 1)
+                                           "\\( .*\\)*$")))
+                 (goto-char (match-end 0))
+                 (re-search-forward block-end-re limit-down :noerror))
+               (> (setq end (match-end 0)) pos)
+               ;; ... without another BLOCK-BEGIN-RE in-between.
+               (goto-char (match-beginning 0))
+               (not (re-search-backward block-begin-re (1+ beg) :noerror))
+               ;; Return value.
+               (cons beg end))))))
+
+  (defun modi/org-split-block ()
+    "Sensibly split the current Org block at point.
+(1) Point in-between a line
+    #+begin_src emacs-lisp             #+begin_src emacs-lisp
+    (message▮ \"one\")                   (message \"one\")
+    (message \"two\")          -->       #+end_src
+    #+end_src                          ▮
+                                       #+begin_src emacs-lisp
+                                       (message \"two\")
+                                       #+end_src
+(2) Point at EOL
+    #+begin_src emacs-lisp             #+begin_src emacs-lisp
+    (message \"one\")▮                   (message \"one\")
+    (message \"two\")          -->       #+end_src
+    #+end_src                          ▮
+                                       #+begin_src emacs-lisp
+                                       (message \"two\")
+                                       #+end_src
+(3) Point at BOL
+    #+begin_src emacs-lisp             #+begin_src emacs-lisp
+    (message \"one\")                    (message \"one\")
+    ▮(message \"two\")          -->      #+end_src
+    #+end_src                          ▮
+                                       #+begin_src emacs-lisp
+                                       (message \"two\")
+                                       #+end_src
+"
+    (interactive)
+    (if (modi/org-in-any-block-p)
+        (save-match-data
+          (save-restriction
+            (widen)
+            (let ((case-fold-search t)
+                  (at-bol (bolp))
+                  block-start
+                  block-end)
+              (save-excursion
+                (re-search-backward "^\\(?1:[[:blank:]]*#\\+begin_.+?\\)\\(?: .*\\)*$" nil nil 1)
+                (setq block-start (match-string-no-properties 0))
+                (setq block-end (replace-regexp-in-string
+                                 "begin_" "end_" ;Replaces "begin_" with "end_", "BEGIN_" with "END_"
+                                 (match-string-no-properties 1))))
+              ;; Go to the end of current line, if not at the BOL
+              (unless at-bol
+                (end-of-line 1))
+              (insert (concat (if at-bol "" "\n")
+                              block-end
+                              "\n\n"
+                              block-start
+                              (if at-bol "\n" "")))
+              ;; Go to the line before the inserted "#+begin_ .." line
+              (beginning-of-line (if at-bol -1 0)))))
+      (message "Point is not in an Org block")))
+
+  (defun modi/org-meta-return (&optional arg)
+    "Insert a new heading or wrap a region in a table.
+Calls `org-insert-heading', `org-insert-item',
+`org-table-wrap-region', or `modi/org-split-block' depending on
+context.  When called with an argument, unconditionally call
+`org-insert-heading'."
+    (interactive "P")
+    (org-check-before-invisible-edit 'insert)
+    (or (run-hook-with-args-until-success 'org-metareturn-hook)
+        (call-interactively (cond (arg #'org-insert-heading)
+                                  ((org-at-table-p) #'org-table-wrap-region)
+                                  ((org-in-item-p) #'org-insert-item)
+                                  ((modi/org-in-any-block-p) #'modi/org-split-block)
+                                  (t #'org-insert-heading)))))
+  (advice-add 'org-meta-return :override #'modi/org-meta-return)
+
+  ;; Make C-u C-return insert heading *at point* (not respecting content),
+  ;; even when the point is directly after a list item.
+  ;; Reason: http://lists.gnu.org/r/emacs-orgmode/2018-02/msg00368.html
+  (defun modi/org-insert-heading-respect-content (&optional invisible-ok)
+    "Insert heading with `org-insert-heading-respect-content' set to t.
+With \\[universal-argument] prefix, insert Org heading directly at
+point."
+    (interactive)
+    (let ((respect-content (unless current-prefix-arg
+                             '(4))))
+      (org-insert-heading respect-content invisible-ok)))
+  (advice-add 'org-insert-heading-respect-content :override
+              #'modi/org-insert-heading-respect-content))
 
 ;; archive subtrees/headings while also preserving their context
 (defadvice org-archive-subtree (around fix-hierarchy activate)

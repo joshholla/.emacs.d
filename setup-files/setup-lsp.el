@@ -1,9 +1,14 @@
-;; Time-stamp: <2018-05-04 00:09:01 csraghunandan>
+;;; setup-lsp.el -*- lexical-binding: t; -*-
+;; Time-stamp: <2018-12-14 01:21:00 csraghunandan>
+
+;; Copyright (C) 2016-2018 Chakravarthy Raghunandan
+;; Author: Chakravarthy Raghunandan <rnraghunandan@gmail.com>
 
 ;; lsp-mode:  Emacs client/library for the Language Server Protocol
 ;; https://github.com/emacs-lsp/lsp-mode
 (use-package lsp-mode
-  :config (setq lsp-rust-rls-command '("rustup" "run" "nightly" "rls")))
+  :commands lsp
+  :config (require 'lsp-clients))
 
 ;; company-lsp: Company completion backend for lsp-mode.
 ;; https://github.com/tigersoldier/company-lsp/
@@ -20,6 +25,7 @@
   (setq lsp-ui-sideline-enable nil
         lsp-ui-doc-enable nil
         lsp-ui-flycheck-enable t
-        lsp-ui-imenu-enable t))
+        lsp-ui-imenu-enable t
+        lsp-ui-sideline-ignore-duplicate t))
 
 (provide 'setup-lsp)
