@@ -19,7 +19,7 @@
         file-name-handler-alist rag--file-name-handler-alist))
 
 (require 'package)
-;; (package-initialize) ;; This throws a warning, but it's needed for new
+(package-initialize) ;; This throws a warning, but it's needed for new
 ;; installs. Commenting it out for now.
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
@@ -82,8 +82,8 @@
 (require 'setup-mode-line)
 (require 'setup-editing)
 (require 'setup-racket)
-(require 'setup-hungry-delete)
-(require 'setup-rust)
+;;(require 'setup-hungry-delete)
+;;(require 'setup-rust)
 (require 'setup-lsp)
 (require 'setup-cc)
 (require 'setup-python)
