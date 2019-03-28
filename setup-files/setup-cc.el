@@ -1,5 +1,5 @@
 ;;; setup-cc.el -*- lexical-binding: t; -*-
-;; Time-stamp: <2018-12-13 23:15:23 csraghunandan>
+;; Time-stamp: <2019-03-27 23:39:22 joshuahollla>
 
 ;; Copyright (C) 2016-2018 Chakravarthy Raghunandan
 ;; Author: Chakravarthy Raghunandan <rnraghunandan@gmail.com>
@@ -154,11 +154,11 @@
              ("\\<[A-Z]\\{3,\\}\\>"  . font-lock-constant-face))
        t)))
 
-  (sp-with-modes '(c-mode c++-mode)
-    (sp-local-pair "/*" "*/" :post-handlers '(("||\n[i]" "RET") ("| " "SPC")))
-    ;; Doxygen blocks
-    (sp-local-pair "/**" "*/" :post-handlers '(("||\n[i]" "RET") ("||\n[i]" "SPC")))
-    (sp-local-pair "/*!" "*/" :post-handlers '(("||\n[i]" "RET") ("[d-1]< | " "SPC"))))
+  ;; (sp-with-modes '(c-mode c++-mode)
+  ;;   (sp-local-pair "/*" "*/" :post-handlers '(("||\n[i]" "RET") ("| " "SPC")))
+  ;;   ;; Doxygen blocks
+  ;;   (sp-local-pair "/**" "*/" :post-handlers '(("||\n[i]" "RET") ("||\n[i]" "SPC")))
+  ;;   (sp-local-pair "/*!" "*/" :post-handlers '(("||\n[i]" "RET") ("[d-1]< | " "SPC"))))
 
   (defun +cc--re-search-for (regexp)
     (save-excursion

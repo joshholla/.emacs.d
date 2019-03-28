@@ -1,7 +1,3 @@
-
-;; Copyright (C) 2016-2018 Chakravarthy Raghunandan
-;; Author: Chakravarthy Raghunandan <rnraghunandan@gmail.com>
-
 ;; Every file opened and loaded by Emacs will run through this list to check for
 ;; a proper handler for the file, but during startup, it won’t need any of them.
 (defvar rag--file-name-handler-alist file-name-handler-alist)
@@ -65,7 +61,7 @@
 (require 'setup-bookmark)
 (require 'setup-hydra)
 (require 'setup-company)
-(require 'setup-smartparens)
+;;(require 'setup-smartparens)
 (require 'setup-git-stuff)
 (require 'setup-avy)
 (require 'setup-ace-window)
@@ -145,6 +141,6 @@
 (setq dired-listing-switches "-aBhl --group-directories-first")
 
 ;; For Zoning out:
-(setq zone-timer (run-with-idle-timer 120 t 'zone))
+(setq zone-timer (run-with-idle-timer 12000 t 'zone))
 
 ;;; init.el ends here

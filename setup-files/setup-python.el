@@ -1,5 +1,5 @@
 ;;; setup-python.el -*- lexical-binding: t; -*-
-;; Time-stamp: <2019-01-14 19:39:52 csraghunandan>
+;; Time-stamp: <2019-03-26 12:23:44 joshuahollla>
 
 ;; Copyright (C) 2016-2018 Chakravarthy Raghunandan
 ;; Author: Chakravarthy Raghunandan <rnraghunandan@gmail.com>
@@ -36,6 +36,15 @@
 ;; pytest: for testing python code
 ;; https://github.com/ionrock/pytest-el
 (use-package pytest :defer t)
+
+;; Prevent long lines from being truncated:
+(set-default 'truncate-lines t)
+
+;; Prevent prettify buffer:
+;(global prettify-symbols-mode 0)
+
+;; Prevent column enforce mode:
+;()
 
 ;; format python buffers using yapf
 ;; https://github.com/JorisE/yapfify/tree/master
