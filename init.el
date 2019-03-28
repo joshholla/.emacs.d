@@ -143,4 +143,10 @@
 ;; For Zoning out:
 (setq zone-timer (run-with-idle-timer 12000 t 'zone))
 
+;; Display line number:
+(global-display-line-numbers-mode)
+
+;; Remove Prettify Symbols
+;; (global-prettify-symbols-mode nil)
+
 ;;; init.el ends here
