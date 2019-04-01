@@ -1,5 +1,5 @@
 ;;; setup-python.el -*- lexical-binding: t; -*-
-;; Time-stamp: <2019-03-26 12:23:44 joshuahollla>
+;; Time-stamp: <2019-03-29 16:47:20 joshuahollla>
 
 ;; Copyright (C) 2016-2018 Chakravarthy Raghunandan
 ;; Author: Chakravarthy Raghunandan <rnraghunandan@gmail.com>
@@ -40,16 +40,10 @@
 ;; Prevent long lines from being truncated:
 (set-default 'truncate-lines t)
 
-;; Prevent prettify buffer:
-;(global prettify-symbols-mode 0)
-
-;; Prevent column enforce mode:
-;()
-
 ;; format python buffers using yapf
 ;; https://github.com/JorisE/yapfify/tree/master
-(use-package yapfify
-  :hook ((python-mode . yapf-mode)))
+;;(use-package yapfify
+;;  :hook ((python-mode . yapf-mode)))
 
 ;; anaconda-mode: bring IDE like features for python-mode
 ;; https://github.com/proofit404/anaconda-mode
