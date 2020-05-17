@@ -1,5 +1,5 @@
 ;;; setup-visual.el -*- lexical-binding: t; -*-
-;; Time-stamp: <2019-01-02 21:17:01 csraghunandan>
+;; Time-stamp: <2020-05-16 21:16:51 joshuaholla>
 
 ;; Copyright (C) 2016-2018 Chakravarthy Raghunandan
 ;; Author: Chakravarthy Raghunandan <rnraghunandan@gmail.com>
@@ -46,6 +46,7 @@
 ;;; all frame related settings
 ;; cursor settings
 (setq-default cursor-type '(bar . 1))
+
 ;; disable annoying cursor blinks
 (blink-cursor-mode -1)
 ;; disable the ugly toolbar
@@ -109,8 +110,8 @@
   (add-hook 'prog-mode-hook (lambda ()
                               (unless (eq major-mode 'web-mode)
                                 (column-enforce-mode))))
-  ;; enforce a column of 80 for highlighting
-  (setq column-enforce-column 80)
+  ;; enforce a column of 180 for highlighting
+  (setq column-enforce-column 180)
   (setq column-enforce-comments nil))
 
 ;; indicate buffer boundaries in the fringe

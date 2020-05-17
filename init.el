@@ -99,7 +99,7 @@
 (require 'setup-kurecolor)
 (require 'setup-erc)
 (require 'setup-font-check)
-(require 'setup-iosevka-ligatures)
+;(require 'setup-iosevka-ligatures)
 (require 'setup-misc)
 (require 'setup-visual)
 (require 'setup-tramp)
@@ -146,7 +146,7 @@
 ;; Display line number:
 (global-display-line-numbers-mode)
 
-;; Remove Prettify Symbols
-;; (global-prettify-symbols-mode nil)
+;; Set zenburn
+(enable-theme 'zenburn)
 
 ;;; init.el ends here

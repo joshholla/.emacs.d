@@ -1,5 +1,5 @@
 ;;; setup-iosevka-ligatures.el -*- lexical-binding: t; -*-
-;; Time-stamp: <2018-08-15 02:58:59 csraghunandan>
+;; Time-stamp: <2020-05-16 20:19:02 joshuaholla>
 
 ;; Copyright (C) 2016-2018 Chakravarthy Raghunandan
 ;; Author: Chakravarthy Raghunandan <rnraghunandan@gmail.com>
@@ -228,14 +228,14 @@
                   ("<+>" . #Xe1cb)
                   ("+>" . #Xe1cc)))))
 
-(defun refresh-pretty ()
-  (prettify-symbols-mode -1)
-  (prettify-symbols-mode +1))
+;; (defun refresh-pretty ()
+;;   (prettify-symbols-mode -1)
+;;   (prettify-symbols-mode +1))
 
-;; Hooks for modes in which to install the iosevka ligatures
-(mapc (lambda (hook)
-	    (add-hook hook (lambda () (setup-iosevka-ligatures) (refresh-pretty))))
-      '(prog-mode-hook))
-(add-hook 'prog-mode-hook #'prettify-symbols-mode)
+;; ;; Hooks for modes in which to install the iosevka ligatures
+;; (mapc (lambda (hook)
+;; 	    (add-hook hook (lambda () (setup-iosevka-ligatures) (refresh-pretty))))
+;;       '(prog-mode-hook))
+;; (add-hook 'prog-mode-hook #'prettify-symbols-mode)
 
-(provide 'setup-iosevka-ligatures)
+;; (provide 'setup-iosevka-ligatures)

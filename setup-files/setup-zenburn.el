@@ -1,5 +1,5 @@
 ;;; setup-zenburn.el -*- lexical-binding: t; -*-
-;; Time-stamp: <2018-11-24 15:40:18 csraghunandan>
+;; Time-stamp: <2020-05-16 20:19:12 joshuaholla>
 
 ;; Copyright (C) 2016-2018 Chakravarthy Raghunandan
 ;; Author: Chakravarthy Raghunandan <rnraghunandan@gmail.com>
@@ -52,9 +52,9 @@
 
     (with-eval-after-load "rainbow-delimiters"
      (set-face-attribute 'rainbow-delimiters-unmatched-face nil :foreground "red" :strike-through t))
-    (with-eval-after-load "column-enforce-mode"
-      (set-face-attribute 'column-enforce-face nil
-                          :underline nil :foreground "firebrick3"))
+    ;; (with-eval-after-load "column-enforce-mode"
+    ;;   (set-face-attribute 'column-enforce-face nil
+    ;;                       :underline nil :foreground "firebrick3"))
 
     ;; markdown specific settings
     (set-face-attribute markdown-header-face-1 nil :foreground "#DFAF8F" :weight 'bold)
