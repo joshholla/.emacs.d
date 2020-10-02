@@ -1,5 +1,5 @@
 * Josh .emacs.d
-My emacs config.
+It's been a fun ride. This was my emacs config for quite a while. However, I've been playing around with vim bindings and spacemacs for the last while. Leaving this repo up for now.
 ** Notes
 - Inspired by the excellent config at https://github.com/CSRaghunandan/.emacs.d
 - Ivy as the preferred completion frontend for emacs.
